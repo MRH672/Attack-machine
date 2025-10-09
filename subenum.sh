@@ -134,5 +134,3 @@ fi
 if [ -z "$INPUT_FILE" ]; then
     rm -f "$domains_file"
 fi
-
-
