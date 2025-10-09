@@ -1,0 +1,16 @@
+﻿# Domain Information
+Original Domain: zdev.net
+File Name: zdev.txt
+Created: 10/09/2025 23:16:33
+==========================================
+
+# You can add subdomains here
+# Examples:
+# www.zdev.net
+# mail.zdev.net
+# ftp.zdev.net
+# admin.zdev.net
+
+# Or use other tools like:
+# subfinder -d zdev.net -o zdev.txt
+# assetfinder --subs-only zdev.net >> zdev.txt
