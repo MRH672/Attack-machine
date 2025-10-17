@@ -1,0 +1,62 @@
+https://subdomainfinder.c99.nl/
+
+https://shrewdeye.app/
+
+'''
+# subfinder - "mars.com" -all --recursive -o subs.txt
+'''
+
+'''
+# echo ~~mars.com~~ | assetfinder --subs-only >> subs.txt
+'''
+
+'''
+
+after collecting all subdomains in subs.txt then let's remove duplicate
+
+# cat subs.txt | anew >> allsubs.txt
+
+# rm subs.txt
+
+# cat allsubs.txt | httpx -o httpx.txt -fc 200
+'''
+
+if you need to fuzz specific site
+
+#dirsearch -u https://mars.com -1 200 -w path/of/wordlist
+
+you can use ffuf and wordlist of file names from google
+
+1- gather urls with katana
+
+# katana -list httpx.txt -o katana.txt
+
+2- gather urls with waybackurls
+
+# cat httpx.txt | waybackurls >> wayback.txt
+
+3-use gospider
+
+#gospider -S httpx.txt | sed -n 's/.*\(https:\/\/[^]*\)]*.*/\1/p' >> gospider.txt
+
+4- gather all files in one file and remove duplicate
+
+# cat katana.txt wayback.txt gospider.txt >> urls.txt
+
+5- remove duplicate with anew
+
+# cat urls.txt | anew >> allurls.txt
+
+# rm urls.txt
+
+6- get javascript files in js.txt
+
+# cat allurls.txt | grep -E "\.js" >> js.txt
+
+7- get php files in php.txt
+
+# cat allurls.txt | grep -E "\.php$" >> php.txt
+
+--LOOK !!!! if you wanna to get analsis abput js files use : 
+
+cat allurls | mantra | tee mantra.txt
