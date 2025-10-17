@@ -8,6 +8,67 @@ subfinder
 curl...
 amass
 wget
+/////////////////////////////////////////////////////////////////////////
+#دي الوظائف لكل title#
+Sublist3r — جمع النطاقات الفرعية (Subdomains) من مصادر عامة (OSINT).
+
+gau (GetAllURLs) — استخراج كل الروابط التاريخية/المؤرشفة (URLs) من مصادر مثل Wayback وCommon Crawl.
+
+waybackurls — استخراج الروابط من أرشيف Wayback Machine فقط.
+
+anew — دمج مخرجات الأدوات في ملف واحد بدون تكرار (append without duplicates).
+
+httpx — فحص ما إذا كانت النطاقات/الخوادم حية وعرض الحالة (status code, title, IP...).
+
+assetfinder — إيجاد subdomains من مصادر OSINT بسرعة وبساطة.
+
+subfinder — تجميع Subdomains من مصادر متعددة (OSINT + APIs) بفاعلية عالية.
+
+curl — إرسال واستقبال طلبات HTTP لفحص Headers أو محتوى صفحات ويب.
+
+amass — أداة متقدمة لاكتشاف Subdomains وتحليل البنية الشبكية (active & passive).
+
+wget — تحميل ملفات أو عمل mirror لمواقع كاملة (recursive download).
+////////////////////////////////////////////////////
+دي الاوامر الخاصه بكل# title#
+1. Sublist3r
+sublist3r -d example.com -o subdomains.txt
+
+2. gau (GetAllURLs)
+gau example.com
+أو لحفظ: gau example.com > urls_gau.txt
+
+3. waybackurls
+echo example.com | waybackurls
+أو من ملف: cat live.txt | waybackurls > urls_wayback.txt
+
+4. anew
+gau example.com | anew urls.txt
+أو لدمج دون تكرار: some_command | anew output.txt
+
+5. httpx
+cat subdomains.txt | httpx -status-code -title -o live.txt
+أو فحص سريع: httpx -l subdomains.txt -o live.txt
+
+6. assetfinder
+assetfinder --subs-only example.com
+أو للتوجيه للملف: assetfinder example.com | anew subdomains.txt
+
+7. subfinder
+subfinder -d example.com -o subdomains.txt
+أو مع API: subfinder -d example.com -o subdomains.txt -silent
+
+8. curl
+curl http://example.com
+curl -I http://example.com # لجلب الـ headers فقط
+
+9. amass
+amass enum -d example.com -o subdomains.txt
+أو تشغيل مسح أوسع: amass enum -d example.com -active -o amass_out.txt
+
+10. wget
+wget http://example.com/file.txt
+wget -r http://example.com # تحميل موقع بشكل recursive
 
 
 
