@@ -1,0 +1,52 @@
+# نتائج الاختبارات
+test_results/
+results/
+*.txt
+*.log
+
+# ملفات مؤقتة
+temp/
+tmp/
+*.tmp
+
+# ملفات النظام
+.DS_Store
+Thumbs.db
+
+# ملفات IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ملفات Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# ملفات Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# ملفات النسخ الاحتياطي
+*.bak
+*.backup
+*~
+
+# ملفات الضغط
+*.zip
+*.tar.gz
+*.rar
+
+# ملفات كبيرة
+*.iso
+*.img
+*.dmg
