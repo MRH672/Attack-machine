@@ -9,6 +9,230 @@ curl...
 amass
 wget
 
+# تقرير مختصر: أدوات Recon واستخدامها الآمن
+
+**إعداد:** زياد عبد الخالق عشيش
+**الهدف:** ملف مرجع عملي وسريع يشرح كل أداة، مخرجاتها المتوقعة، أمثلة أوامر جاهزة، ونصائح أمان لتشغيلها داخل بيئة اختبار (VM/Docker).
+
+> ملاحظة سريعة: شغّل الأدوات فقط على نطاقات تملكها أو في بيئة اختبارية. أي استخدام خارجي بدون إذن قد يكون مخالفًا للقانون.
+
+---
+
+## ١) ملخص سريع (One-liner لكل أداة)
+
+* **Sublist3r**: يجمع subdomains من مصادر OSINT. (Passive)
+* **gau (GetAllUrls)**: يجلب URLs التاريخية من Wayback/Common Crawl. (Passive)
+* **waybackurls**: يجلب URLs من Wayback Machine. (Passive)
+* **anew**: يدمج قوائم ويحتفظ بالجديد فقط (dedupe helper).
+* **httpx**: يفحص الـ URLs/hosts ويختبر الاستجابة HTTP (live check).
+* **assetfinder**: يبحث عن الأصول/subdomains عبر مصادر OSINT.
+* **subfinder**: مكتشف سريع وقوي للنطاقات الفرعية (OSINT).
+* **curl**: أداة طلبات HTTP عامة (active request).
+* **amass**: أداة شاملة للاستكشاف (passive/active/brute)، تنتج JSON/text/graph.
+* **wget**: تنزيل صفحات/مواقع أو mirroring (active).
+
+---
+
+## ٢) لكل أداة: وصف + ناتج متوقع + أمر مثال
+
+### Sublist3r
+
+* **وصف:** يجمع subdomains من مصادر مختلفة.
+* **ناتج متوقع:** ملف نصي مثل `sublist3r.txt` يحوي قائمة سطور لكل subdomain.
+* **مثال:**
+
+```bash
+sublist3r -d example.com -o sublist3r.txt
+```
+
+### gau
+
+* **وصف:** يجلب جميع الـ URLs المعروفة لدومين من مجموعات أرشيفية.
+* **ناتج متوقع:** `gau_urls.txt` (قائمة URLs).
+* **مثال:**
+
+```bash
+gau example.com > gau_urls.txt
+```
+
+### waybackurls
+
+* **وصف:** يستخرج روابط من Wayback Machine.
+* **ناتج متوقع:** `wayback.txt` محتوى URLs.
+* **مثال:**
+
+```bash
+echo example.com | waybackurls > wayback.txt
+```
+
+### anew
+
+* **وصف:** أداة دمج قوائم وإزالة تكرار وإبقاء الجديد.
+* **ناتج متوقع:** `all_urls.txt` (مُنقَّح).
+* **مثال:**
+
+```bash
+cat gau_urls.txt wayback.txt | anew all_urls.txt
+```
+
+### httpx
+
+* **وصف:** يتحقق من حالة HTTP لكل URL/host (status, title, TLS,...)
+* **ناتج متوقع:** `live.txt` يضم الـ URLs الحية مع رموز الحالة.
+* **مثال:**
+
+```bash
+cat all_urls.txt | httpx -silent -status-code -o live.txt
+```
+
+### assetfinder
+
+* **وصف:** بحث سريع عن subdomains عبر مصادر OSINT.
+* **ناتج متوقع:** `assetfinder.txt` قائمة subdomains.
+* **مثال:**
+
+```bash
+assetfinder --subs-only example.com > assetfinder.txt
+```
+
+### subfinder
+
+* **وصف:** مكتشف subdomains عالي الأداء يعتمد على مجموعات مصادر مُحدَّثة.
+* **ناتج متوقع:** `subfinder.txt` أو دمجه مع بقية القوائم.
+* **مثال:**
+
+```bash
+subfinder -d example.com -o subfinder.txt
+```
+
+### curl
+
+* **وصف:** أداة عامة لعمل طلبات HTTP/HTTPS.
+* **ناتج متوقع:** محتوى صفحة أو رؤوس (headers).
+* **مثال:**
+
+```bash
+curl -I https://example.com
+```
+
+### amass
+
+* **وصف:** أداة قوية لاستكشاف النطاقات الفرعية، تقدم أوضاع passive وactive.
+* **ناتج متوقع:** `amass.txt`, `amass.json`, وربما `out/example.gexf` للكائنات البيانية.
+* **مثال (آمن - passive):**
+
+```bash
+amass enum -passive -d example.com -o amass.txt -json amass.json
+```
+
+### wget
+
+* **وصف:** تنزيل صفحات/مواقع، مفيد للـ mirroring الداخلي.
+* **ناتج متوقع:** نسخة محلية من صفحة/مجلد أو ملفات مفردة.
+* **مثال (آمن):**
+
+```bash
+wget --mirror --no-parent --reject "png,jpg,zip" https://example.com/somepath/
+```
+
+---
+
+## ٣) Pipeline عملي موحّد (آمن، يعمل داخل VM)
+
+1. **اكتشاف subdomains**
+
+```bash
+assetfinder --subs-only example.com > assetfinder.txt
+subfinder -d example.com -o subfinder.txt
+cat assetfinder.txt subfinder.txt | sort -u > all_subs.txt
+```
+
+2. **جمع URLs من الأرشيف**
+
+```bash
+gau example.com > gau.txt
+echo example.com | waybackurls >> gau.txt
+cat gau.txt | sort -u > urls_raw.txt
+```
+
+3. **دمج وتنقية**
+
+```bash
+cat urls_raw.txt | anew all_urls.txt
+```
+
+4. **فحص الـ URLs/hosts الحية**
+
+```bash
+cat all_urls.txt | httpx -silent -status-code -o live.txt
+```
+
+5. **تشغيل Amass (للاستفادة من نتائج أوسع)**
+
+```bash
+amass enum -passive -d example.com -o amass.txt -json amass.json
+```
+
+6. **(اختياري - بعد إذن/على بيئة اختبار) فحص نشط بسيط**
+
+```bash
+# مثال nmap على hosts حية (تشغيل داخل VM فقط)
+for h in $(cat live.txt); do nmap -Pn -sT -p 22,80,443 --reason -oN nmap_${h}.txt $h; done
+```
+
+---
+
+## ٤) مخرجات متوقعة (مثال مبسّط)
+
+* `all_subs.txt` — قائمة بالنطاقات الفرعية: `api.example.com`\n`dev.example.com`\n...
+* `all_urls.txt` — قائمة URLs من gau/wayback.
+* `live.txt` — URLs/hosts حية مع رموز الحالة.
+* `amass.json` — JSON مفصل بمصادر الاكتشاف.
+* `nmap_*.txt` — تقارير nmap لكل host (لو شغّلت nmap).
+
+---
+
+## ٥) نصائح أمان وسلوك (مختصر ومهم)
+
+* لا تعمل فحوصات active (brute, nmap intensive) على نطاقات ليست ملكك. القانون يطبق. ⚖️
+* استخدم VM أو Docker مع `--network none` أو شبكة داخلية عند التجربة. 🔒
+* اقرأ السكربتات قبل التشغيل: `head -n 20 script.sh` و`grep` عن `rm -rf|curl .*sh|wget .*sh`.
+* احتفظ بسجل تشغيل (`out/` و`logs/`) للمراجعة.
+
+---
+
+## ٦) ملف الإعداد السريع (templates)
+
+**allowed_targets.txt** (مثال):
+
+```
+localhost
+127.0.0.1
+example.com
+mytest.local
+```
+
+**script-runner.sh** (تشغيل pipeline بسيط):
+
+```bash
+#!/usr/bin/env bash
+mkdir -p out
+cat all_subs.txt all_urls.txt | sort -u > out/combined_unique.txt
+cat out/combined_unique.txt | httpx -silent -status-code -o out/live.txt
+amass enum -passive -d example.com -o out/amass.txt -json out/amass.json
+```
+
+---
+
+## ٧) خاتمة قصيرة - خطوة تالية
+
+لو تحب: أعملك 3 حاجات بسرعة:
+
+1. أصدّر التقرير ده كملف Word (.docx) وأعطيك رابط تحميل.
+2. أكتب لك سكربت واحد جاهز (bash) ينفّذ الـ pipeline بأمان داخل VM ويولد المخرجات في مجلد `out/`.
+3. أراجع `Amass.sh` عندك وأحدّثه ليتبع نفس المعايير (allowed list + logging + خيار nmap بعد تأكيد).
+
+قول لي تختار (1)، (2)، أو (3) — وأنا أنفّذ اللي تختاره فورًا. ✨
 
 
 
