@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # =============================================================================
+# Subdomain Enumeration Tools Installer
 # سكريبت التثبيت التلقائي لأدوات Subdomain Enumeration
-# Auto Installation Script for Subdomain Enumeration Tools
 # =============================================================================
-
-set -euo pipefail
 
 # === إعدادات الألوان ===
 RED='\033[0;31m'
@@ -43,16 +41,11 @@ show_banner() {
     ║    ███████║╚██████╔╝██████╔╝██║  ██║╚██████╔╝██║ ╚═╝ ██║    ║
     ║    ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝    ║
     ║                                                              ║
-    ║              Subdomain Tools Auto Installer                  ║
+    ║              Subdomain Tools Installer                      ║
     ║                                                              ║
     ╚══════════════════════════════════════════════════════════════╝
 EOF
     echo -e "${NC}"
-}
-
-# === دالة التحقق من وجود الأمر ===
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
 }
 
 # === دالة التحقق من الصلاحيات ===
@@ -67,7 +60,6 @@ check_root() {
 # === دالة تحديث النظام ===
 update_system() {
     print_status "STEP" "Updating system packages..."
-    
     apt-get update -qq
     print_status "SUCCESS" "System packages updated"
 }
@@ -162,25 +154,11 @@ install_sublist3r() {
     rm -rf "$temp_dir"
 }
 
-# === دالة تثبيت جميع الأدوات ===
-install_all_tools() {
-    print_status "STEP" "Installing subdomain enumeration tools..."
-    
-    # Go tools
-    print_status "INFO" "Installing Go-based tools..."
-    install_go_tool "subfinder" "github.com/projectdiscovery/subfinder/v2/cmd/subfinder"
-    install_go_tool "assetfinder" "github.com/tomnomnom/assetfinder"
-    install_go_tool "httpx" "github.com/projectdiscovery/httpx/cmd/httpx"
-    install_go_tool "anew" "github.com/tomnomnom/anew"
-    install_go_tool "waybackurls" "github.com/tomnomnom/waybackurls"
-    install_go_tool "gau" "github.com/lc/gau/v2/cmd/gau"
-    
-    # Python tools
-    print_status "INFO" "Installing Python-based tools..."
-    install_sublist3r
-    
-    # Binary tools (Amass)
+# === دالة تثبيت Amass ===
+install_amass() {
     print_status "INFO" "Installing Amass..."
+    
+    # Get latest release info
     local release_info=$(curl -s "https://api.github.com/repos/OWASP/Amass/releases/latest")
     local download_url=$(echo "$release_info" | grep "browser_download_url.*linux_amd64.zip" | cut -d '"' -f 4 | head -1)
     
@@ -200,7 +178,32 @@ install_all_tools() {
         
         cd /
         rm -rf "$temp_dir"
+    else
+        print_status "ERROR" "Failed to download Amass"
+        return 1
     fi
+}
+
+# === دالة تثبيت جميع الأدوات ===
+install_all_tools() {
+    print_status "STEP" "Installing subdomain enumeration tools..."
+    
+    # Go tools
+    print_status "INFO" "Installing Go-based tools..."
+    install_go_tool "subfinder" "github.com/projectdiscovery/subfinder/v2/cmd/subfinder"
+    install_go_tool "assetfinder" "github.com/tomnomnom/assetfinder"
+    install_go_tool "httpx" "github.com/projectdiscovery/httpx/cmd/httpx"
+    install_go_tool "anew" "github.com/tomnomnom/anew"
+    install_go_tool "waybackurls" "github.com/tomnomnom/waybackurls"
+    install_go_tool "gau" "github.com/lc/gau/v2/cmd/gau"
+    
+    # Python tools
+    print_status "INFO" "Installing Python-based tools..."
+    install_sublist3r
+    
+    # Binary tools
+    print_status "INFO" "Installing binary tools..."
+    install_amass
 }
 
 # === دالة التحقق من التثبيت ===
@@ -221,7 +224,7 @@ verify_installations() {
     local all_installed=true
     
     for tool in "${tools[@]}"; do
-        if command_exists "$tool"; then
+        if command -v "$tool" >/dev/null 2>&1; then
             print_status "SUCCESS" "$tool is available"
         else
             print_status "ERROR" "$tool is not available"
@@ -238,35 +241,32 @@ verify_installations() {
     fi
 }
 
-# === دالة إنشاء سكريبتات الاختبار ===
-create_test_scripts() {
-    print_status "STEP" "Creating test scripts..."
+# === دالة جعل السكريبتات قابلة للتنفيذ ===
+make_scripts_executable() {
+    print_status "STEP" "Making test scripts executable..."
     
-    # Create test scripts for each tool
-    cat > "test_all_tools.sh" << 'EOF'
-#!/bin/bash
-echo "=== Testing All Tools ==="
-echo "Testing subfinder..."
-subfinder -d example.com -silent | head -5
-echo "Testing assetfinder..."
-assetfinder --subs-only example.com | head -5
-echo "Testing httpx..."
-echo "http://example.com" | httpx -silent
-echo "Testing gau..."
-gau example.com | head -5
-echo "Testing waybackurls..."
-waybackurls example.com | head -5
-echo "Testing anew..."
-echo -e "test1.com\ntest2.com" | anew
-echo "Testing amass..."
-amass enum -d example.com -silent | head -5
-echo "Testing sublist3r..."
-python3 /usr/local/bin/sublist3r.py -d example.com -o test.txt
-echo "All tests completed!"
-EOF
+    local scripts=(
+        "Sublist3r.sh"
+        "Subfinder.sh"
+        "Assetfinder.sh"
+        "HTTPx.sh"
+        "Anew.sh"
+        "GAU.sh"
+        "Waybackurls.sh"
+        "Amass.sh"
+        "Curl.sh"
+        "Wget.sh"
+        "test_all_tools.sh"
+    )
     
-    chmod +x "test_all_tools.sh"
-    print_status "SUCCESS" "Test scripts created"
+    for script in "${scripts[@]}"; do
+        if [ -f "$script" ]; then
+            chmod +x "$script"
+            print_status "SUCCESS" "$script is now executable"
+        else
+            print_status "WARNING" "$script not found"
+        fi
+    done
 }
 
 # === الدالة الرئيسية ===
@@ -289,8 +289,8 @@ main() {
     if verify_installations; then
         print_status "SUCCESS" "Installation completed successfully!"
         
-        # Create test scripts
-        create_test_scripts
+        # Make scripts executable
+        make_scripts_executable
         
         echo
         print_status "INFO" "You can now use these tools:"
@@ -300,7 +300,7 @@ main() {
         echo -e "  ${CYAN}amass enum -d example.com${NC}"
         echo -e "  ${CYAN}sublist3r.py -d example.com${NC}"
         echo
-        print_status "INFO" "Run './test_all_tools.sh' to test all tools"
+        print_status "INFO" "Run './test_all_tools.sh example.com' to test all tools"
     else
         print_status "ERROR" "Installation failed. Please check the errors above."
         exit 1
