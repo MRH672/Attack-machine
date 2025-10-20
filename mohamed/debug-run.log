@@ -1,0 +1,25 @@
++ set -euo pipefail
++ IFS='
+	'
++ HTTPX_THREADS=30
++ HTTPX_TIMEOUT=8
++ GAU_CONCURRENCY=8
++ AMASS_ACTIVE=false
++ TOP_HEADERS=30
++ WGET_MIRROR=false
++ RESULTS_BASE=results
+++ date +%Y%m%d-%H%M%S
++ DATESTAMP=20251020-122406
++ SUBFINDER_BIN=subfinder
++ ASSETFINDER_BIN=assetfinder
++ AMASS_BIN=amass
++ SUBLIST3R_BIN=sublist3r
++ HTTPX_BIN=httpx
++ GAU_BIN=gau
++ WAYBACK_BIN=waybackurls
++ ANEW_BIN=anew
++ WGET_BIN=wget
++ CURL_BIN=curl
++ JQ_BIN=jq
+./recon-full.sh: line 54: warning: here-document at line 45 delimited by end-of-file (wanted `EOF')
+./recon-full.sh: line 55: syntax error: unexpected end of file
