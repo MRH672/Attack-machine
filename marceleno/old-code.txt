@@ -252,7 +252,6 @@ check_existing_tools() {
         "anew"
         "waybackurls"
         "gau"
-        "katana"
         "sublist3r.py"
         "amass"
     )
@@ -295,7 +294,6 @@ install_tools() {
     install_go_tool "anew" "github.com/tomnomnom/anew"
     install_go_tool "waybackurls" "github.com/tomnomnom/waybackurls"
     install_go_tool "gau" "github.com/lc/gau/v2/cmd/gau"
-    install_go_tool "katana" "github.com/projectdiscovery/katana/cmd/katana"
 
     # Python tools
     print_status "INFO" "Installing Python-based tools..."
@@ -317,7 +315,6 @@ verify_installations() {
         "anew"
         "waybackurls"
         "gau"
-        "katana"
         "sublist3r.py"
         "amass"
     )
@@ -345,23 +342,12 @@ verify_installations() {
 get_subdomains() {
     local domain=$1
 
-    print_status "INFO" "Running subfinder..."
     local subfinder_output=$(subfinder -d "$domain" -silent)
     local subdomains="$subfinder_output"
 
-    print_status "INFO" "Running assetfinder..."
     local assetfinder_output=$(echo "$domain" | assetfinder --subs-only)
     subdomains+="$assetfinder_output"
 
-    print_status "INFO" "Running amass passive..."
-    local amass_output=$(amass enum -passive -d "$domain" -silent 2>/dev/null)
-    subdomains+="$amass_output"
-
-    print_status "INFO" "Running sublist3r..."
-    local sublist3r_output=$(sublist3r -d "$domain" -t 10 2>/dev/null || echo "")
-    subdomains+="$sublist3r_output"
-
-    # Remove duplicates
     local anew_output=$(echo "$subdomains" | anew)
     subdomains="$anew_output"
 
@@ -379,7 +365,7 @@ test_subdomains(){
 katana_endpoints(){
     local subdomains=$1
 
-    local katana_output=$(echo "$subdomains" | katana -silent)
+    local katana_output=$(echo "$subdomains" | katana -silent)"$katana_output"
 
     echo "$katana_output"
 }
@@ -390,14 +376,6 @@ waybackurls_endpoints(){
     local waybackurls_urls=$(echo "$subdomains" | waybackurls)
 
     echo "$waybackurls_urls"
-}
-
-gau_endpoints(){
-    local subdomains=$1
-
-    local gau_urls=$(echo "$subdomains" | gau --threads 5)
-
-    echo "$gau_urls"
 }
 
 # === Main function ===
@@ -446,87 +424,35 @@ main() {
 
     if [ -z "$subdomains" ]; then
         print_status "ERROR" "No subdomains found for $domain"
-        exit 1
     else
-        local subdomain_count=$(echo "$subdomains" | wc -l)
-        print_status "SUCCESS" "Found $subdomain_count subdomains!"
+        print_status "SUCCESS" "Found $(echo "$subdomains" | wc -l) subdomains!"
     fi
 
-    print_status "INFO" "Testing subdomains with httpx..."
+    print_status "INFO" "Testing subdomains..."
     local httpx_subdomains=$(test_subdomains "$subdomains")
 
-    if [ -z "$httpx_subdomains" ]; then
-        print_status "ERROR" "No working subdomains found (all returned non-200 status)"
-        exit 1
-    else
-        local working_count=$(echo "$httpx_subdomains" | wc -l)
-        print_status "SUCCESS" "Tested: $subdomain_count, Working: $working_count"
-    fi
+    print_status "SUCCESS" "Tested: $(echo "$subdomains" | wc -l), Working: $(echo "$httpx_subdomains" | wc -l)"
 
     print_status "INFO" "Getting endpoints from $(echo "$httpx_subdomains" | wc -l) subdomains..."
     print_status "WARNING" "This may take a while!"
 
-    print_status "INFO" "katana crawling started..."
+    print_status "INFO" "katana started!"
     local katana_output=$(katana_endpoints "$httpx_subdomains")
     print_status "SUCCESS" "Katana finished!"
 
-    print_status "INFO" "waybackurls started..."
+    print_status "INFO" "waybackurls started!"
     local waybackurls_output=$(waybackurls_endpoints "$httpx_subdomains")
     print_status "SUCCESS" "waybackurls finished!"
 
-    print_status "INFO" "gau started..."
-    local gau_output=$(gau_endpoints "$httpx_subdomains")
-    print_status "SUCCESS" "gau finished!"
+    local endpoints_raw="$katana_output$waybackurls_output"
 
-    # Combine all endpoints
-    local endpoints_raw="$katana_output$waybackurls_output$gau_output"
-    
-    # Remove duplicates
     local endpoints=$(echo "$endpoints_raw" | anew)
 
-    # Count endpoints
-    local endpoint_count=$(echo "$endpoints" | wc -l)
-    print_status "SUCCESS" "Found $endpoint_count unique endpoints!"
+    mkdir -p $domain && cd $domain
+    echo "$endpoints" | grep -E "\.js" > js.txt &
+    echo "$endpoints" | grep -E "\.php" > php.txt &
 
-    # Create output directory
-    mkdir -p "$domain"
-    cd "$domain"
-
-    # Save all endpoints
-    echo "$endpoints" > all_endpoints.txt
-    print_status "SUCCESS" "Saved all endpoints to all_endpoints.txt"
-
-    # Filter and save by type
-    print_status "INFO" "Filtering endpoints by file type..."
-
-    if echo "$endpoints" | grep -qE "\.js"; then
-        echo "$endpoints" | grep -E "\.js" > js.txt
-        print_status "SUCCESS" "Saved $(wc -l < js.txt) JavaScript files to js.txt"
-    fi
-
-    if echo "$endpoints" | grep -qE "\.php"; then
-        echo "$endpoints" | grep -E "\.php" > php.txt
-        print_status "SUCCESS" "Saved $(wc -l < php.txt) PHP files to php.txt"
-    fi
-
-    if echo "$endpoints" | grep -qE "\.json"; then
-        echo "$endpoints" | grep -E "\.json" > json.txt
-        print_status "SUCCESS" "Saved $(wc -l < json.txt) JSON files to json.txt"
-    fi
-
-    if echo "$endpoints" | grep -qE "\.css"; then
-        echo "$endpoints" | grep -E "\.css" > css.txt
-        print_status "SUCCESS" "Saved $(wc -l < css.txt) CSS files to css.txt"
-    fi
-
-    if echo "$endpoints" | grep -qE "\.xml"; then
-        echo "$endpoints" | grep -E "\.xml" > xml.txt
-        print_status "SUCCESS" "Saved $(wc -l < xml.txt) XML files to xml.txt"
-    fi
-
-    echo
-    print_status "SUCCESS" "All results saved in directory: $domain/"
-    print_status "INFO" "Run 'cd $domain' to view results"
+    print_status "SUCCESS" "Results saved at $domain/"
 }
 
 # === Run main function ===
