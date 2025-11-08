@@ -85,3 +85,4 @@ sudo ./marceleno/get_endpoints_timed.sh example.com
 | ملف إحصائيات | ❌ لا | ✅ statistics.txt |
 | عرض التقدم | محدود | مفصل جداً |
 
+
