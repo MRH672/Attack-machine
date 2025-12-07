@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a website without limits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #E8D5FF 0%, #F0E6FF 50%, #E8D5FF 100%);
+            min-height: 100vh;
+            color: #000;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #000;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #4A90E2;
+        }
+
+        .arrow {
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+
+        .globe-icon {
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #357ABD;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Color Palette */
+        .color-palette {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Headlines */
+        .main-headline {
+            font-size: 4.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            color: #000;
+        }
+
+        .sub-headline {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #333;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .btn-cta {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-cta:hover {
+            background: #357ABD;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+        }
+
+        .cta-note {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Visual Elements */
+        .visual-elements {
+            position: relative;
+            min-height: 600px;
+            margin-top: 4rem;
+        }
+
+        .element {
+            position: absolute;
+        }
+
+        /* Image Element (Top Right) */
+        .image-element {
+            top: 0;
+            right: 10%;
+            width: 200px;
+        }
+
+        .selection-box {
+            position: relative;
+            border: 2px dashed #4A90E2;
+            border-radius: 8px;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #4A90E2;
+            border: 2px solid white;
+            border-radius: 50%;
+            bottom: -6px;
+            right: -6px;
+            cursor: nwse-resize;
+        }
+
+        .element-label {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            font-size: 0.75rem;
+            color: #4A90E2;
+            font-weight: 500;
+        }
+
+        .image-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transform: rotate(-15deg);
+        }
+
+        .abstract-shape {
+            height: 40px;
+            border-radius: 4px;
+        }
+
+        .shape-1 {
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            width: 80%;
+            margin-left: 10%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .shape-2 {
+            background: #2ECC71;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .shape-3 {
+            background: linear-gradient(135deg, #4A90E2 0%, #87CEEB 100%);
+            background-image: 
+                radial-gradient(circle at 20% 30%, white 2px, transparent 2px),
+                radial-gradient(circle at 80% 70%, white 1px, transparent 1px);
+            background-size: 20px 20px, 15px 15px;
+            width: 90%;
+            margin-left: 5%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* AI Tooltip */
+        .ai-tooltip {
+            top: 150px;
+            right: 15%;
+        }
+
+        .speech-bubble {
+            background: white;
+            padding: 0.6rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
+
+        .sparkle {
+            font-size: 1rem;
+        }
+
+        /* Product Card */
+        .product-card {
+            left: 5%;
+            top: 20%;
+            width: 220px;
+        }
+
+        .product-image {
+            background: #1a5f3f;
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .lamp {
+            position: relative;
+            width: 100%;
+            height: 200px;
+        }
+
+        .lamp-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 60px;
+            background: #FF6B35;
+            border-radius: 20px;
+        }
+
+        .lamp-shade {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 80px;
+            background: #D4A574;
+            border-radius: 50% 50% 0 0;
+            box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .lamp-glow {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 60px;
+            background: radial-gradient(ellipse, rgba(255, 255, 200, 0.6) 0%, transparent 70%);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { opacity: 0.6; }
+            to { opacity: 0.9; }
+        }
+
+        .product-label {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Text Element */
+        .text-element {
+            bottom: 20%;
+            left: 8%;
+            width: 180px;
+        }
+
+        .text-content {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #4A90E2;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        /* Person Card */
+        .person-card {
+            bottom: 10%;
+            right: 12%;
+            width: 200px;
+            position: relative;
+        }
+
+        .person-image {
+            background: #FF6B35;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .person-avatar {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #4A90E2 0%, #87CEEB 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .person-avatar::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: #D4A574;
+            border-radius: 50%;
+            box-shadow: 0 0 0 20px #2ECC71;
+        }
+
+        .person-avatar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: #2ECC71;
+        }
+
+        .edit-icon {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        .footer-text {
+            position: absolute;
+            left: 2rem;
+            bottom: 2rem;
+            font-size: 0.85rem;
+            color: #666;
+            transform: rotate(-90deg);
+            transform-origin: left bottom;
+            white-space: nowrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-headline {
+                font-size: 3.5rem;
+            }
+            
+            .visual-elements {
+                min-height: 500px;
+            }
+            
+            .product-card {
+                left: 2%;
+            }
+            
+            .image-element {
+                right: 5%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-wrap: wrap;
+                padding: 1rem;
+            }
+            
+            .nav-center {
+                display: none;
+            }
+            
+            .main-headline {
+                font-size: 2.5rem;
+            }
+            
+            .sub-headline {
+                font-size: 1.1rem;
+            }
+            
+            .visual-elements {
+                min-height: 400px;
+            }
+            
+            .element {
+                position: relative;
+                margin: 2rem auto;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: auto !important;
+            }
+            
+            .footer-text {
+                position: relative;
+                transform: none;
+                text-align: center;
+                margin-top: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-left">
+                <div class="logo">WIX</div>
+            </div>
+            <div class="nav-center">
+                <a href="#" class="nav-link">Product <span class="arrow">▼</span></a>
+                <a href="#" class="nav-link">Solutions <span class="arrow">▼</span></a>
+                <a href="#" class="nav-link">Resources <span class="arrow">▼</span></a>
+                <a href="#" class="nav-link">Pricing</a>
+                <a href="#" class="nav-link">Wix Studio</a>
+                <a href="#" class="nav-link">Enterprise</a>
+            </div>
+            <div class="nav-right">
+                <span class="globe-icon">🌐</span>
+                <a href="#" class="nav-link">Log in</a>
+                <button class="btn-primary">Get Started</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Color Palette Indicator -->
+        <div class="color-palette">
+            <div class="color-dot" style="background-color: #FF6B35;"></div>
+            <div class="color-dot" style="background-color: #4A90E2;"></div>
+            <div class="color-dot" style="background-color: #9B59B6;"></div>
+            <div class="color-dot" style="background-color: #2ECC71;"></div>
+        </div>
+
+        <!-- Main Headline -->
+        <h1 class="main-headline">Create a website without limits.</h1>
+        <p class="sub-headline">Bring your vision to life with the website builder that gives you the tools you need to succeed.</p>
+
+        <!-- Call to Action -->
+        <div class="cta-section">
+            <button class="btn-cta">Get Started</button>
+            <p class="cta-note">Start for free. No credit card required.</p>
+        </div>
+
+        <!-- Visual Elements -->
+        <div class="visual-elements">
+            <!-- Image Element (Top Right) -->
+            <div class="element image-element">
+                <div class="selection-box">
+                    <div class="resize-handle"></div>
+                    <div class="element-label">Image</div>
+                    <div class="image-content">
+                        <div class="abstract-shape shape-1"></div>
+                        <div class="abstract-shape shape-2"></div>
+                        <div class="abstract-shape shape-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Image Editor Tooltip -->
+            <div class="element ai-tooltip">
+                <div class="speech-bubble">
+                    <span class="sparkle">✨</span>
+                    <span>AI image editor</span>
+                </div>
+            </div>
+
+            <!-- Product Card (Left Middle) -->
+            <div class="element product-card">
+                <div class="product-image">
+                    <div class="lamp">
+                        <div class="lamp-base"></div>
+                        <div class="lamp-shade"></div>
+                        <div class="lamp-glow"></div>
+                    </div>
+                </div>
+                <div class="product-label">Norder Lamp $84.00</div>
+            </div>
+
+            <!-- Text Element (Bottom Left) -->
+            <div class="element text-element">
+                <div class="selection-box">
+                    <div class="resize-handle"></div>
+                    <div class="element-label">Text</div>
+                    <div class="text-content">GRÜN</div>
+                </div>
+            </div>
+
+            <!-- Person Card (Bottom Right) -->
+            <div class="element person-card">
+                <div class="edit-icon">✏️</div>
+                <div class="person-image">
+                    <div class="person-avatar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-text">Created with Wix.</div>
+    </main>
+</body>
+</html>
+
