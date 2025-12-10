@@ -1,0 +1,62 @@
+from typing import List
+
+
+def get_user_input() -> List[float]:
+    """يطلب من المستخدم إدخال 6 أرقام."""
+    numbers: List[float] = []
+    print("الرجاء إدخال 6 أرقام:")
+    
+    for i in range(6):
+        while True:
+            try:
+                num = float(input(f"أدخل الرقم {i + 1}: "))
+                numbers.append(num)
+                break
+            except ValueError:
+                print("خطأ! الرجاء إدخال رقم صحيح.")
+    
+    return numbers
+
+
+def find_statistics(numbers: List[float]) -> dict:
+    """يجد الأصغر والأوسط والأكبر من المصفوفة."""
+    if not numbers:
+        return {}
+    
+    sorted_numbers = sorted(numbers)
+    length = len(sorted_numbers)
+    
+    # الرقم الأصغر
+    smallest = sorted_numbers[0]
+    
+    # الرقم الأكبر
+    largest = sorted_numbers[-1]
+    
+    # الرقم الأوسط
+    if length % 2 == 1:
+        middle = sorted_numbers[length // 2]
+    else:
+        mid1 = sorted_numbers[length // 2 - 1]
+        mid2 = sorted_numbers[length // 2]
+        middle = (mid1 + mid2) / 2
+    
+    return {
+        "smallest": smallest,
+        "middle": middle,
+        "largest": largest
+    }
+
+
+def print_results(numbers: List[float], stats: dict) -> None:
+    """يطبع النتائج."""
+    print("\n" + "="*40)
+    print(f"المصفوفة: {numbers}")
+    print(f"الرقم الأصغر: {stats['smallest']}")
+    print(f"الرقم الأوسط: {stats['middle']}")
+    print(f"الرقم الأكبر: {stats['largest']}")
+
+
+if __name__ == "__main__":
+    numbers = get_user_input()
+    stats = find_statistics(numbers)
+    print_results(numbers, stats)
