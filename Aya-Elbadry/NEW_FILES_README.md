@@ -76,3 +76,5 @@ python sqlmap.py -u "http://target.com/page?id=1" \
 **تم الإنشاء بواسطة:** Aya Elbadry (@Aya-Elbadry)  
 **التاريخ:** 2025
 
+
+

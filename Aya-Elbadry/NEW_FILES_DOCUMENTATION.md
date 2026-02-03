@@ -323,3 +323,5 @@ python sqlmap.py -u "http://target.com/page?id=1" --tamper=space2comment,charenc
 **التاريخ:** 2025  
 **الترخيص:** GPLv2
 
+
+
