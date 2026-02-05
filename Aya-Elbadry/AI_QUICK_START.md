@@ -77,3 +77,5 @@ python ai_payload_manager.py learn --payload "AND/**/1=1" --success --waf Cloudf
 
 **للمزيد:** راجع `AI_INTEGRATION_GUIDE.md`
 
+
+
