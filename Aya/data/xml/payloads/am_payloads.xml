@@ -3,11 +3,11 @@
 <!--
  Aya custom WAF-bypass payloads
  - Focus on heavy / obfuscated SQLi payloads (boolean, time, UNION, stacked)
- - Designed to help in bypassing WAFs مثل Akamai و Cloudflare وغيرهم
+ - Designed to help in bypassing WAFs like Akamai, Cloudflare, Imperva, etc.
 
  NOTE:
- - هذه الملفات تتبع نفس الـ schema الأساسية لـ sqlmap payloads
- - يتم تحميل هذه الـ payloads فقط عند استخدام الخيار --AM
+ - These payloads follow the same schema as standard sqlmap payloads
+ - These payloads are loaded only when using the --AM option
 -->
 
 <root>
@@ -141,5 +141,3 @@
     </test>
 
 </root>
-
-
